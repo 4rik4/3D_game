@@ -1,16 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Zenject;
 
-public class CoreInstaller : MonoBehaviour
+public class CoreInstaller : MonoInstaller<CoreInstaller>
 {
-    private void Start()
+    public override void InstallBindings()
     {
-        
+        BindInputService();
     }
 
-    private void Update()
+    private void BindInputService()
     {
-        
+        Container
+            .BindInterfacesAndSelfTo<InputService>()
+            .AsSingle()
+            .NonLazy();
     }
 }
