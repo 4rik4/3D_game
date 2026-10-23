@@ -13,6 +13,9 @@ public class InputService : IInputService, IInitializable, IDisposable
     public event Action JumpPressed;
     public event Action<Vector2> LookPerformed;
 
+    public event Action GetPressed;
+    public event Action DropPressed;
+
     public Vector2 Direction => _direction;
     public bool IsUsing => _isUsing;
 
@@ -27,6 +30,18 @@ public class InputService : IInputService, IInitializable, IDisposable
         _input.Player.Use.started += OnUse;
         _input.Player.Use.canceled += OnUse;
         _input.Player.Look.performed += OnLook;
+        _input.Player.Take.started += OnGet;
+        _input.Player.Drop.started += OnDrop;
+    }
+
+    private void OnGet(InputAction.CallbackContext context) 
+    { 
+        GetPressed?.Invoke();
+    }
+
+    private void OnDrop(InputAction.CallbackContext context)
+    {
+        DropPressed?.Invoke();
     }
 
     private void OnLook(InputAction.CallbackContext obj)
@@ -58,6 +73,8 @@ public class InputService : IInputService, IInitializable, IDisposable
         _input.Player.Use.started -= OnUse;
         _input.Player.Use.canceled -= OnUse;
         _input.Player.Look.performed -= OnLook;
+        _input.Player.Take.started -= OnGet;
+        _input.Player.Drop.started -= OnDrop;
 
         _input.Disable();
     }

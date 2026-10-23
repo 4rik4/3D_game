@@ -10,5 +10,7 @@ public interface IInputService
     public bool IsUsing { get; }
     public event Action JumpPressed;
     public event Action<Vector2> LookPerformed;
+    event Action GetPressed;
+    event Action DropPressed;
 }
 
