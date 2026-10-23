@@ -40,12 +40,10 @@ public class PlayerHandService : IInitializable, IDisposable
         Ray ray = _playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         if (Physics.Raycast(ray, out RaycastHit hit, _interactionDistance, _heavyLayer))
         {
-            Debug.Log("gejhdwvyej");
             Rigidbody rb = hit.collider.GetComponent<Rigidbody>();
             if (rb != null)
             {
                 _currentHeldObject = new HeavyObjectData(hit.transform, rb);
-                Debug.Log($"HoldPointNull?{_holdPoint == null}");
 
                 _currentHeldObject.Rigidbody.isKinematic = true;
                 _currentHeldObject.Rigidbody.useGravity = false;
