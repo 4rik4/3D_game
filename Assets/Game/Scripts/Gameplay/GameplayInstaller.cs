@@ -37,14 +37,17 @@ public class GameplayInstaller : MonoInstaller<GameplayInstaller>
 
     private void BindHoldPoint()
     {
-        CharacterView character = Container.Resolve<CharacterView>();
-
-        _holdPoint = character.HoldPoint;
-
         Container
         .BindInterfacesAndSelfTo<PlayerHandService>()
+        .FromMethod((Zenject.InjectContext context) =>
+        {
+            IInputService input = context.Container.Resolve<IInputService>();
+            CharacterView character = context.Container.Resolve<CharacterView>();
+
+            return new PlayerHandService(input, character.HoldPoint, character.PlayerCamera, (LayerMask)LayerMask.GetMask("Heavy"));
+        })
         .AsSingle()
-        .WithArguments(_holdPoint, character.PlayerCamera, (LayerMask)LayerMask.GetMask("Heavy"));
+        .NonLazy();
     }
 
 }

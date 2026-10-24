@@ -38,20 +38,26 @@ public class PlayerHandService : IInitializable, IDisposable
         if (_currentHeldObject != null) return;
 
         Ray ray = _playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-        if (Physics.Raycast(ray, out RaycastHit hit, _interactionDistance, _heavyLayer))
+        if (Physics.Raycast(ray, out RaycastHit hit, _interactionDistance, _heavyLayer/*TryGetComponent<BoxController>(out BoxController box)*/))
         {
             Rigidbody rb = hit.collider.GetComponent<Rigidbody>();
+            Collider collider = hit.collider.GetComponent<BoxCollider>();
+
+
             if (rb != null)
             {
-                _currentHeldObject = new HeavyObjectData(hit.transform, rb);
+                _currentHeldObject = new HeavyObjectData(hit.transform, rb, collider);
 
                 _currentHeldObject.Rigidbody.isKinematic = true;
+                _currentHeldObject.Collider.enabled = false;
                 _currentHeldObject.Rigidbody.useGravity = false;
 
                 _currentHeldObject.Transform.SetParent(_holdPoint);
                 _currentHeldObject.Transform.localPosition = Vector3.zero;
                 _currentHeldObject.Transform.localRotation = Quaternion.identity;
+
             }
+                ObjectPickedUp?.Invoke();   
         }
     }
 
@@ -61,9 +67,12 @@ public class PlayerHandService : IInitializable, IDisposable
 
         _currentHeldObject.Transform.SetParent(null);
         _currentHeldObject.Rigidbody.isKinematic = false;
+        _currentHeldObject.Collider.enabled = true;
         _currentHeldObject.Rigidbody.useGravity = true;
 
         _currentHeldObject = null;
+
+        ObjectDroppedDown?.Invoke();
     }
 
     public void Dispose()

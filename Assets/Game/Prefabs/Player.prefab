@@ -125,11 +125,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <CharacterController>k__BackingField: {fileID: 4394431803158909743}
-  <MaxSpeed>k__BackingField: 5
+  <MaxSpeed>k__BackingField: 7
   <JumpSpeed>k__BackingField: 5
-  <Sensitivity>k__BackingField: 3
+  <Sensitivity>k__BackingField: 7
   <PlayerCamera>k__BackingField: {fileID: 81641895919050231}
-  <MaxLookAngle>k__BackingField: 50
+  <MaxLookAngle>k__BackingField: 70
   <HoldPoint>k__BackingField: {fileID: 5605753364329560631}
 --- !u!143 &4394431803158909743
 CharacterController:
@@ -275,9 +275,9 @@ Transform:
   m_GameObject: {fileID: 6398064608131992811}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.376, z: 0.597}
+  m_LocalPosition: {x: 0, y: -0.38, z: 0.73}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 7908757511626147249}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
