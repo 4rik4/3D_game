@@ -6,6 +6,7 @@ using UnityEngine;
 
 public interface IInputService
 {
+    public Vector2 MouseDelta { get; }
     public Vector2 Direction { get; }
     public bool IsUsing { get; }
     public event Action JumpPressed;

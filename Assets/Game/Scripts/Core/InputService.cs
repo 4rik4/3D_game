@@ -8,6 +8,7 @@ public class InputService : IInputService, IInitializable, IDisposable
     private InputActions _input = new();
 
     private Vector2 _direction;
+    private Vector2 _mouseDirection;
     private bool _isUsing;
 
     public event Action JumpPressed;
@@ -17,6 +18,7 @@ public class InputService : IInputService, IInitializable, IDisposable
     public event Action DropPressed;
 
     public Vector2 Direction => _direction;
+    public Vector2 MouseDelta => _mouseDirection;
     public bool IsUsing => _isUsing;
 
     private void SubscribeToEvents()
@@ -46,7 +48,8 @@ public class InputService : IInputService, IInitializable, IDisposable
 
     private void OnLook(InputAction.CallbackContext obj)
     {
-        LookPerformed?.Invoke(obj.ReadValue<Vector2>());
+        _mouseDirection = obj.ReadValue<Vector2>();
+        LookPerformed?.Invoke(_mouseDirection);
     }
 
     private void OnUse(InputAction.CallbackContext context)

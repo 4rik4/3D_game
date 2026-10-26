@@ -12,10 +12,12 @@ public class PlayerHandService : IDisposable
     private float _interactionDistance = 10f;
     private HeavyObjectController _currentHeldObject;
 
-    private float _maxPossibleSize = 1.3f;
+    [SerializeField] private float _maxPossibleSize = 1.3f;
+    [SerializeField] private float _throwForce = 10.0f;
 
     private Rigidbody _rb;
     private Collider _collider;
+    private Vector2 _mouseDelta;
 
     public event Action<float> ObjectPickedUp;
     public event Action ObjectDroppedDown;
@@ -27,6 +29,7 @@ public class PlayerHandService : IDisposable
 
         _holdPoint = _characterView.HoldPoint;
         _playerCamera = _characterView.PlayerCamera;
+
         _inputService.GetPressed += PickUpObject;
         _inputService.DropPressed += DropObject;
     }
@@ -77,9 +80,16 @@ public class PlayerHandService : IDisposable
 
         _currentHeldObject = null;
 
+        _mouseDelta = _inputService.MouseDelta;
+        if(_mouseDelta.magnitude > 0.1f)
+        {
+            Vector3 throwDirection = _playerCamera.transform.forward;
+            _rb.AddForce(throwDirection * _throwForce, ForceMode.Impulse);
+        }
+
         ObjectDroppedDown?.Invoke();
     }
-
+     
     public void Dispose()
     {
         _inputService.GetPressed -= PickUpObject;
