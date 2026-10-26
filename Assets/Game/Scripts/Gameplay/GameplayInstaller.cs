@@ -39,13 +39,6 @@ public class GameplayInstaller : MonoInstaller<GameplayInstaller>
     {
         Container
         .BindInterfacesAndSelfTo<PlayerHandService>()
-        .FromMethod((Zenject.InjectContext context) =>
-        {
-            IInputService input = context.Container.Resolve<IInputService>();
-            CharacterView character = context.Container.Resolve<CharacterView>();
-
-            return new PlayerHandService(input, character.HoldPoint, character.PlayerCamera, (LayerMask)LayerMask.GetMask("Heavy"));
-        })
         .AsSingle()
         .NonLazy();
     }

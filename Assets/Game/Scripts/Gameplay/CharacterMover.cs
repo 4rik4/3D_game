@@ -8,18 +8,19 @@ public class CharacterMover : ITickable
 {
     private IInputService _input;
     private CharacterView _characterView;
+    private HeavyObjectController _boxView;
     private PlayerHandService _handService;
     private Camera _playerCamera;
 
     private float _maxSpeed;
     private float _jumpSpeed;
+    private float _sensetivity;
+    private float _maxVertAngle;
+    private float _weight;
 
     private Vector3 _velocity;
     private float _gravity = 9.81f;
-
-    private float _maxLookAngle;
-    private float _pitch = 0.0f;
-    private Vector3 _lookInput;
+    private float _currentVertAngle;
 
     private float _bobSpeed = 10f;
     private Vector3 _bobAmount = new Vector3(0f, 0.1f, 0f);
@@ -32,39 +33,34 @@ public class CharacterMover : ITickable
         _characterView = characterView;
         _handService = handService;
 
+        _maxVertAngle = _characterView.MaxVertAngle;
         _maxSpeed = _characterView.MaxSpeed;
         _jumpSpeed = _characterView.JumpSpeed;
+        _sensetivity = _characterView.Sensetivity;
+
 
         _playerCamera = _characterView.PlayerCamera;
-        _maxLookAngle = _characterView.MaxLookAngle;
 
         _input.JumpPressed += Jump;
-        _input.LookPerformed += OnLook;
+        _input.LookPerformed += Rotate;
         _handService.ObjectPickedUp += PickUp;
         _handService.ObjectDroppedDown += DropDown;
 
 
         Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
         _cameraOriginalPos = _playerCamera.transform.localPosition;
     }
 
-    private void PickUp()
+    private void PickUp(float boxWeight)
     {
-        _maxSpeed -= 4;
-        _jumpSpeed -= 2.5f;
+        _maxSpeed -= boxWeight * 0.4f;
+        _jumpSpeed -= boxWeight / 3f;
     }
 
     private void DropDown()
     {
         _maxSpeed = _characterView.MaxSpeed;
         _jumpSpeed = _characterView.JumpSpeed;
-    }
-
-    private void OnLook(Vector2 lookDelta)
-    {
-        _lookInput = lookDelta;
     }
 
     private void Jump()
@@ -78,20 +74,19 @@ public class CharacterMover : ITickable
     private void Move()
     {
         _characterView.CharacterController.Move(_velocity * Time.deltaTime);
+        HeadBob();
     }
 
-    private void Rotate()
+    private void Rotate(Vector2 input)
     {
-        Vector2 look = _lookInput * _characterView.Sensitivity * 0.01f;
+        float rotationY = input.x * _sensetivity * Time.deltaTime;
+        _characterView.transform.rotation *= Quaternion.Euler(0f, rotationY, 0f);
 
-        _characterView.CharacterController.transform.Rotate(Vector3.up * look.x);
-
-        _pitch -= look.y;
-        _pitch = Mathf.Clamp(_pitch, -_maxLookAngle, _maxLookAngle);
-
-        _playerCamera.transform.localRotation = Quaternion.Euler(_pitch, 0f, 0f);
-
-        _lookInput = Vector2.zero;
+        float rotationX = input.y * _sensetivity * Time.deltaTime;
+        _characterView.Head.transform.rotation *= Quaternion.Euler(rotationX, rotationY, 0f);
+        _currentVertAngle -= rotationX;
+        _currentVertAngle = Mathf.Clamp(_currentVertAngle, -_maxVertAngle, _maxVertAngle);
+        _characterView.Head.localEulerAngles = new Vector3(_currentVertAngle, 0f, 0f);
     }
 
     private void ChangeVelocity()
@@ -123,30 +118,11 @@ public class CharacterMover : ITickable
         }
         else
             _bobTimer = Mathf.Lerp(_bobTimer, 0f, Time.deltaTime * _bobSpeed);
-        /*bool isWalking = _input.Direction.sqrMagnitude > 0.01f && _characterView.CharacterController.isGrounded;
-
-        if (isWalking)
-        {
-            _bobTimer += Time.deltaTime * _bobSpeed;
-
-            _playerCamera.transform.localPosition = new Vector3(0, _cameraOriginalPos.y + Mathf.Sin(_bobTimer) * _bobAmount.y, 0);
-        }
-        else
-        {
-            _bobTimer = 0f;
-            _playerCamera.transform.localPosition = Vector3.Lerp(
-                _playerCamera.transform.localPosition,
-                _cameraOriginalPos,
-                Time.deltaTime * _bobSpeed
-            );
-        }*/
     }
 
     public void Tick()
     {
         ChangeVelocity();
         Move();
-        Rotate();
-        HeadBob();
     }
 }
