@@ -13,6 +13,8 @@ public class CharacterMover : ITickable
     private Camera _playerCamera;
 
     private float _maxSpeed;
+    private float _sprintSpeed;
+    private float _currentSpeed;
     private float _jumpSpeed;
     private float _sensetivity;
     private float _maxVertAngle;
@@ -21,11 +23,12 @@ public class CharacterMover : ITickable
     private Vector3 _velocity;
     private float _gravity = 9.81f;
     private float _currentVertAngle;
-
     private float _bobSpeed = 10f;
     private Vector3 _bobAmount = new Vector3(0f, 0.1f, 0f);
     private Vector3 _cameraOriginalPos;
     private float _bobTimer = 0f;
+    private bool _isHolding = false;
+  //  private bool _isSprinting = false;
 
     public CharacterMover(IInputService input, CharacterView characterView, PlayerHandService handService)
     {
@@ -35,32 +38,58 @@ public class CharacterMover : ITickable
 
         _maxVertAngle = _characterView.MaxVertAngle;
         _maxSpeed = _characterView.MaxSpeed;
+        _sprintSpeed = _characterView.SprintSpeed;
         _jumpSpeed = _characterView.JumpSpeed;
         _sensetivity = _characterView.Sensetivity;
-
 
         _playerCamera = _characterView.PlayerCamera;
 
         _input.JumpPressed += Jump;
         _input.LookPerformed += Rotate;
+        _input.ShiftStarted += Sprint;
+        _input.ShiftStopped += Sprint;
         _handService.ObjectPickedUp += PickUp;
         _handService.ObjectDroppedDown += DropDown;
 
+        _currentSpeed = _maxSpeed;
 
         Cursor.lockState = CursorLockMode.Locked;
         _cameraOriginalPos = _playerCamera.transform.localPosition;
     }
 
+    private void Sprint()
+    {
+        if (_isHolding) Debug.Log("No спринтинг брат");
+        else
+        {
+            if (_input.IsSprinting == true)
+            {
+                // _isSprinting = true;
+                _currentSpeed = _sprintSpeed;
+            }
+            else
+            {
+                //  _isSprinting = false;
+                _currentSpeed = _maxSpeed;
+            }
+        }
+    }
+
     private void PickUp(float boxWeight)
     {
-        _maxSpeed -= boxWeight * 0.4f;
+        if (boxWeight * 0.4 <= _maxSpeed)
+            _currentSpeed -= boxWeight * 0.4f;
+        else
+            _currentSpeed = 0;
         _jumpSpeed -= boxWeight / 3f;
+        _isHolding = true;
     }
 
     private void DropDown()
     {
-        _maxSpeed = _characterView.MaxSpeed;
+        _currentSpeed = _maxSpeed;
         _jumpSpeed = _characterView.JumpSpeed;
+        _isHolding = false;
     }
 
     private void Jump()
@@ -91,6 +120,7 @@ public class CharacterMover : ITickable
 
     private void ChangeVelocity()
     {
+
         if (_characterView.CharacterController.isGrounded == false)
             _velocity.y -= _gravity * Time.deltaTime;
 
@@ -100,8 +130,8 @@ public class CharacterMover : ITickable
         Vector3 moveDirection = new Vector3(direction.x, 0, direction.y);
         moveDirection = _characterView.CharacterController.transform.TransformDirection(moveDirection);
 
-        _velocity.x = moveDirection.x * _maxSpeed;
-        _velocity.z = moveDirection.z * _maxSpeed;
+        _velocity.x = moveDirection.x * _currentSpeed;
+        _velocity.z = moveDirection.z * _currentSpeed;
     }
 
     private void HeadBob()

@@ -9,9 +9,12 @@ public interface IInputService
     public Vector2 MouseDelta { get; }
     public Vector2 Direction { get; }
     public bool IsUsing { get; }
+    public bool IsSprinting { get; }
+    public event Action ShiftStarted;
+    public event Action ShiftStopped;
     public event Action JumpPressed;
     public event Action<Vector2> LookPerformed;
-    event Action GetPressed;
-    event Action DropPressed;
+    public event Action GetPressed;
+    public event Action DropPressed;
 }
 

@@ -14,9 +14,12 @@ public class InputService : IInputService, IInitializable, IDisposable, ITickabl
     private float _resetDeltaTime = 6f;
     private float _idleTime = 0f;
 
-    public event Action JumpPressed;
-    public event Action<Vector2> LookPerformed;
+    public bool IsSprinting { get; private set; } = false;
 
+    public event Action JumpPressed;
+    public event Action ShiftStarted;
+    public event Action ShiftStopped;
+    public event Action<Vector2> LookPerformed;
     public event Action GetPressed;
     public event Action DropPressed;
 
@@ -31,14 +34,37 @@ public class InputService : IInputService, IInitializable, IDisposable, ITickabl
         _input.Player.Walking.started += OnMove;
         _input.Player.Walking.performed += OnMove;
         _input.Player.Walking.canceled += OnMove;
+
         _input.Player.Jump.started += OnJump;
+
         _input.Player.Use.started += OnUse;
         _input.Player.Use.canceled += OnUse;
+
         _input.Player.Look.performed += Look;
         _input.Player.Look.canceled += StopLook;
+
         _input.Player.Take.started += OnGet;
         _input.Player.Drop.started += OnDrop;
+
+        _input.Player.Sprint.started += OnSprint;
+        _input.Player.Sprint.canceled += OnSprint;
     }
+
+    private void OnSprint(InputAction.CallbackContext context)
+    {
+        if (context.started)
+        { 
+            IsSprinting = true;
+            ShiftStarted?.Invoke();
+        }
+        else if (context.canceled)
+        {
+            IsSprinting = false;
+            ShiftStopped?.Invoke();
+        }
+    }
+
+
 
     private void OnGet(InputAction.CallbackContext context) 
     { 
@@ -82,13 +108,20 @@ public class InputService : IInputService, IInitializable, IDisposable, ITickabl
         _input.Player.Walking.started -= OnMove;
         _input.Player.Walking.performed -= OnMove;
         _input.Player.Walking.canceled -= OnMove;
+
         _input.Player.Jump.started -= OnJump;
+
         _input.Player.Use.started -= OnUse;
         _input.Player.Use.canceled -= OnUse;
+
         _input.Player.Look.performed -= Look;
         _input.Player.Look.canceled -= StopLook;
+
         _input.Player.Take.started -= OnGet;
         _input.Player.Drop.started -= OnDrop;
+
+        _input.Player.Sprint.started -= OnSprint;
+        _input.Player.Sprint.canceled -= OnSprint;
 
         _input.Disable();
     }

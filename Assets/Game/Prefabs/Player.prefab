@@ -124,14 +124,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe4cc03dc76768546ac2a8abe20662d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <CharacterController>k__BackingField: {fileID: 4394431803158909743}
-  <MaxSpeed>k__BackingField: 7
-  <JumpSpeed>k__BackingField: 5
-  <Head>k__BackingField: {fileID: 3901235912336341536}
-  <Sensetivity>k__BackingField: 10
-  <PlayerCamera>k__BackingField: {fileID: 81641895919050231}
-  <MaxVertAngle>k__BackingField: 50
-  <HoldPoint>k__BackingField: {fileID: 5605753364329560631}
+  _characterController: {fileID: 4394431803158909743}
+  _maxSpeed: 5
+  _sprintSpeed: 13
+  _jumpSpeed: 5
+  _head: {fileID: 3901235912336341536}
+  _sensetivity: 10
+  _playerCamera: {fileID: 81641895919050231}
+  _maxVertAngle: 75
+  _holdPoint: {fileID: 5605753364329560631}
 --- !u!143 &4394431803158909743
 CharacterController:
   m_ObjectHideFlags: 0

@@ -406,7 +406,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 993b5400926fd3c4a8fd1525e90f70a8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Weight>k__BackingField: 10
+  <Weight>k__BackingField: 7
 --- !u!1 &856858780
 GameObject:
   m_ObjectHideFlags: 0
