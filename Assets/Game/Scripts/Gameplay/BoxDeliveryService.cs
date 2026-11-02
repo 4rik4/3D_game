@@ -1,17 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System;
 using Zenject;
+using UnityEngine;
 
 using Game.Scripts.Gameplay.Views;
 
-public class BoxDeliveryService 
+public class BoxDeliveryService : IDisposable
 {
     private TriggerView _triggerView;
     private CharacterView _characterView;
+
     public event Action OnWon;
     public event Action<HeavyObjectController> OnDestroy;
+
     private int _boxesDelivered = 0;
     private int _boxCount;
 
@@ -21,21 +23,26 @@ public class BoxDeliveryService
         _characterView = characterView;
 
         _boxCount = _characterView.BoxCount;
-        _triggerView.TriggerEntered += OnDelivered;
+
+        _triggerView.BoxEntered += OnDelivered;
     }
 
-    private void OnDelivered(Collider other)
+    private void OnDelivered(HeavyObjectController box)
     {
-        if (other.TryGetComponent(out HeavyObjectController box) == false) return;
-        Debug.Log("dostavleno");
         if (!box.IsDelivering) return;
         OnDestroy?.Invoke(box);
 
         _boxesDelivered++;
+
         if (_boxesDelivered == _boxCount)
         {
             Debug.Log("victory");
             OnWon?.Invoke();
         }
+    }
+
+    public void Dispose()
+    {
+        _triggerView.BoxEntered -= OnDelivered;
     }
 }
