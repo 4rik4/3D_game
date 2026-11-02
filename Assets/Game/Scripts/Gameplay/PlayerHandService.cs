@@ -16,10 +16,10 @@ public class PlayerHandService : IDisposable
     private float _stackHeight = 0f;
     public float stackWeight { get; private set; } = 0f;
     private float _currentBoxWeight;
-
-    [SerializeField] private float _maxPossibleSize = 1.3f;
-    [SerializeField] private float _throwForce = 10.0f;
-    [SerializeField] private int _maxPossibleCount = 3;
+    
+    private float _maxPossibleSize = 1.3f;
+    private float _throwForce = 10.0f;
+    private int _maxPossibleCount = 3;
 
     private Vector2 _mouseDelta;
 
@@ -54,7 +54,6 @@ public class PlayerHandService : IDisposable
 
         Rigidbody rb = box.GetComponent<Rigidbody>();
         Collider collider = box.GetComponent<Collider>();
-        Debug.Log("sdfghjk");
         box.transform.SetParent(_holdPoint);
         rb.isKinematic = true;
         rb.useGravity = false;
@@ -99,10 +98,8 @@ public class PlayerHandService : IDisposable
             Vector3 throwDirection = _playerCamera.transform.forward;
             rb.AddForce(throwDirection * _throwForce, ForceMode.Impulse);
         }
-        Debug.Log(boxToDrop.GetComponent<Collider>().bounds.size.y);
 
         _stackHeight -= boxToDrop.transform.localScale.y;
-        Debug.Log(_stackHeight);
         stackWeight -= boxToDrop.Weight;
         ObjectDroppedDown?.Invoke();
     }

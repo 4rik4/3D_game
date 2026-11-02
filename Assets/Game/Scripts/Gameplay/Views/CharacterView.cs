@@ -15,5 +15,8 @@ namespace Game.Scripts.Gameplay.Views
          [field: SerializeField] public Transform HoldPoint { get; private set; }
          [field: SerializeField] public LayerMask InteractableLayer { get; private set; }
          [field: SerializeField] public float InteractionDistance { get; private set; } = 10f;
+        [field: SerializeField] public int BoxCount { get; private set; } = 3;
+
+
     }
 }

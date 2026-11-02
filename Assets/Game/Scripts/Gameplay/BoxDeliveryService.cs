@@ -1,18 +1,41 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using Zenject;
 
-public class BoxDeliveryService : MonoBehaviour
+using Game.Scripts.Gameplay.Views;
+
+public class BoxDeliveryService 
 {
-    // Start is called before the first frame update
-    void Start()
+    private TriggerView _triggerView;
+    private CharacterView _characterView;
+    public event Action OnWon;
+    public event Action<HeavyObjectController> OnDestroy;
+    private int _boxesDelivered = 0;
+    private int _boxCount;
+
+    public BoxDeliveryService(TriggerView triggerView, CharacterView characterView)
     {
-        
+        _triggerView = triggerView;
+        _characterView = characterView;
+
+        _boxCount = _characterView.BoxCount;
+        _triggerView.TriggerEntered += OnDelivered;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnDelivered(Collider other)
     {
-        
+        if (other.TryGetComponent(out HeavyObjectController box) == false) return;
+        Debug.Log("dostavleno");
+        if (!box.IsDelivering) return;
+        OnDestroy?.Invoke(box);
+
+        _boxesDelivered++;
+        if (_boxesDelivered == _boxCount)
+        {
+            Debug.Log("victory");
+            OnWon?.Invoke();
+        }
     }
 }

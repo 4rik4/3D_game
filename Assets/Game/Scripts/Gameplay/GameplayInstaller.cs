@@ -8,7 +8,8 @@ public class GameplayInstaller : MonoInstaller<GameplayInstaller>
 {
     [SerializeField] private Transform _spawnPoint;
     [SerializeField] private CharacterView _characterPrefab;
-    [SerializeField] private TriggerTaker _trigger;
+    [SerializeField] private TriggerView _trigger;
+    
     private Transform _holdPoint;
 
     public override void InstallBindings()
@@ -16,6 +17,8 @@ public class GameplayInstaller : MonoInstaller<GameplayInstaller>
         BindCharacterView();
         BindCharacterMover();
         BindHoldPoint();
+        BindTriggerView();
+        BindBoxDeliveryService();
     }
 
     private void BindCharacterView()
@@ -44,4 +47,20 @@ public class GameplayInstaller : MonoInstaller<GameplayInstaller>
         .NonLazy();
     }
 
+    private void BindTriggerView()
+    {
+        Container
+           .Bind<TriggerView>()
+           .FromInstance(_trigger)
+           .AsSingle()
+           .NonLazy();
+    }
+
+    private void BindBoxDeliveryService()
+    {
+        Container
+        .BindInterfacesAndSelfTo<BoxDeliveryService>()
+        .AsSingle()
+        .NonLazy();
+    }
 }
