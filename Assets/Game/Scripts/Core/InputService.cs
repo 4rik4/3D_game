@@ -64,8 +64,6 @@ public class InputService : IInputService, IInitializable, IDisposable, ITickabl
         }
     }
 
-
-
     private void OnGet(InputAction.CallbackContext context) 
     { 
         GetPressed?.Invoke();

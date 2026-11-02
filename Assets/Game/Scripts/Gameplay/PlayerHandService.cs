@@ -1,25 +1,29 @@
 using UnityEngine;
 using Zenject;
 using System;
+using System.Collections.Generic;
 
 using Game.Scripts.Gameplay.Views;
+
 public class PlayerHandService : IDisposable
 {
     private IInputService _inputService;
     private Transform _holdPoint;
     private CharacterView _characterView;
     private Camera _playerCamera;
-    private float _interactionDistance = 10f;
-    private HeavyObjectController _currentHeldObject;
+
+    private List<HeavyObjectController> _currentHeldObjects = new List<HeavyObjectController>();
+    private float _stackHeight = 0f;
+    public float stackWeight { get; private set; } = 0f;
+    private float _currentBoxWeight;
 
     [SerializeField] private float _maxPossibleSize = 1.3f;
     [SerializeField] private float _throwForce = 10.0f;
+    [SerializeField] private int _maxPossibleCount = 3;
 
-    private Rigidbody _rb;
-    private Collider _collider;
     private Vector2 _mouseDelta;
 
-    public event Action<float> ObjectPickedUp;
+    public event Action ObjectPickedUp;
     public event Action ObjectDroppedDown;
 
     public PlayerHandService(IInputService inputService, CharacterView view)
@@ -36,57 +40,70 @@ public class PlayerHandService : IDisposable
 
     private void PickUpObject()
     {
-        if (_currentHeldObject != null) return;
+        if (_currentHeldObjects.Count == _maxPossibleCount) {Debug.Log("низзя брат, слишком многа");  return; } 
 
         Ray ray = _playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
-        if (Physics.Raycast(ray, out RaycastHit hit, _interactionDistance))
-        {
-            if (hit.collider.TryGetComponent<HeavyObjectController>(out HeavyObjectController box))
-            {
-                    Vector3 boxSize = hit.collider.bounds.size;
-                    float maxSide = Mathf.Max(boxSize.x, boxSize.y, boxSize.z);
+        if (Physics.Raycast(ray, out RaycastHit hit, _characterView.InteractionDistance, _characterView.InteractableLayer) == false) return;
 
-                if (maxSide < _maxPossibleSize)
-                {
-                    _currentHeldObject = box;
-                    _rb = _currentHeldObject.GetComponent<Rigidbody>();
-                    _collider = _currentHeldObject.GetComponent<Collider>();
+        if (hit.collider.TryGetComponent(out HeavyObjectController box) == false) return;
+
+        Vector3 boxSize = hit.transform.localScale;
+        float maxSide = Mathf.Max(boxSize.x, boxSize.y, boxSize.z);
+
+        if (maxSide > _maxPossibleSize) {Debug.Log("too big"); return; }
+
+        Rigidbody rb = box.GetComponent<Rigidbody>();
+        Collider collider = box.GetComponent<Collider>();
+        Debug.Log("sdfghjk");
+        box.transform.SetParent(_holdPoint);
+        rb.isKinematic = true;
+        rb.useGravity = false;
+        collider.enabled = false;
+
+        float yOffset = _stackHeight + (boxSize.y / 2f);
+
+        box.gameObject.layer = 1;
+        box.transform.localPosition = new Vector3(0, yOffset, 0);
+        box.transform.localRotation = Quaternion.identity;
+
+        _currentHeldObjects.Add(box);
+
+        _stackHeight += boxSize.y;
+
+        _currentBoxWeight = box.Weight;
+        stackWeight += _currentBoxWeight;
+        ObjectPickedUp?.Invoke();
                     
-                    _rb.isKinematic = true;
-                    _collider.enabled = false;
-                    _rb.useGravity = false;
-
-                    _currentHeldObject.transform.SetParent(_holdPoint);
-                    _currentHeldObject.transform.localPosition = Vector3.zero;
-                    _currentHeldObject.transform.localRotation = Quaternion.identity;
-
-                    float weight = _currentHeldObject.Weight;
-                    ObjectPickedUp?.Invoke(weight);
-                }
-                else
-                    Debug.Log("too big");
-            }
-        }
     }
 
     private void DropObject()
     {
-        if (_currentHeldObject == null) return;
+        if (_currentHeldObjects.Count == 0) return;
 
-        _currentHeldObject.transform.SetParent(null);
-        _rb.isKinematic = false;
-        _collider.enabled = true;
-        _rb.useGravity = true;
+        HeavyObjectController boxToDrop = _currentHeldObjects[_currentHeldObjects.Count - 1];
+        _currentHeldObjects.RemoveAt(_currentHeldObjects.Count - 1);
 
-        _currentHeldObject = null;
+        boxToDrop.transform.SetParent(null);
+
+        Rigidbody rb = boxToDrop.GetComponent<Rigidbody>();
+        Collider collider = boxToDrop.GetComponent<Collider>();
+        rb.isKinematic = false;
+        collider.enabled = true;
+        rb.useGravity = true;
+
+        boxToDrop.gameObject.layer = boxToDrop.StartLayer;
 
         _mouseDelta = _inputService.MouseDelta;
         if(_mouseDelta.magnitude > 0.1f)
         {
             Vector3 throwDirection = _playerCamera.transform.forward;
-            _rb.AddForce(throwDirection * _throwForce, ForceMode.Impulse);
+            rb.AddForce(throwDirection * _throwForce, ForceMode.Impulse);
         }
+        Debug.Log(boxToDrop.GetComponent<Collider>().bounds.size.y);
 
+        _stackHeight -= boxToDrop.transform.localScale.y;
+        Debug.Log(_stackHeight);
+        stackWeight -= boxToDrop.Weight;
         ObjectDroppedDown?.Invoke();
     }
      

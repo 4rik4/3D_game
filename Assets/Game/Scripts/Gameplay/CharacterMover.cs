@@ -19,14 +19,15 @@ public class CharacterMover : ITickable
     private float _sensetivity;
     private float _maxVertAngle;
     private float _weight;
-
-    private Vector3 _velocity;
     private float _gravity = 9.81f;
     private float _currentVertAngle;
     private float _bobSpeed = 10f;
+    private float _bobTimer = 0f;
+
+    private Vector3 _velocity;
     private Vector3 _bobAmount = new Vector3(0f, 0.1f, 0f);
     private Vector3 _cameraOriginalPos;
-    private float _bobTimer = 0f;
+
     private bool _isHolding = false;
   //  private bool _isSprinting = false;
 
@@ -75,13 +76,14 @@ public class CharacterMover : ITickable
         }
     }
 
-    private void PickUp(float boxWeight)
+    private void PickUp()
     {
-        if (boxWeight * 0.4 <= _maxSpeed)
-            _currentSpeed -= boxWeight * 0.4f;
+        if (_handService.stackWeight <= 5) return;
+        if (_handService.stackWeight * 0.4 <= _maxSpeed)
+            _currentSpeed = _maxSpeed - _handService.stackWeight * 0.4f;
         else
             _currentSpeed = 0;
-        _jumpSpeed -= boxWeight / 3f;
+        _jumpSpeed -= _handService.stackWeight / 3f;
         _isHolding = true;
     }
 
@@ -139,7 +141,7 @@ public class CharacterMover : ITickable
         Vector3 horizontalVelocity = new Vector3(_velocity.x, 0, _velocity.z);
         float currentSpeed = horizontalVelocity.magnitude;
 
-        if (currentSpeed > 0.01f)
+        if (currentSpeed > 0.01f && _characterView.CharacterController.isGrounded)
         {
             float speedMultiplier = currentSpeed / _maxSpeed;
             _bobTimer += Time.deltaTime * _bobSpeed * speedMultiplier;

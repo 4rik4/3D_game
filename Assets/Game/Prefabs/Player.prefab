@@ -124,15 +124,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe4cc03dc76768546ac2a8abe20662d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _characterController: {fileID: 4394431803158909743}
-  _maxSpeed: 5
-  _sprintSpeed: 13
-  _jumpSpeed: 5
-  _head: {fileID: 3901235912336341536}
-  _sensetivity: 10
-  _playerCamera: {fileID: 81641895919050231}
-  _maxVertAngle: 75
-  _holdPoint: {fileID: 5605753364329560631}
+  <CharacterController>k__BackingField: {fileID: 4394431803158909743}
+  <MaxSpeed>k__BackingField: 5
+  <SprintSpeed>k__BackingField: 100
+  <JumpSpeed>k__BackingField: 5
+  <Head>k__BackingField: {fileID: 3901235912336341536}
+  <Sensetivity>k__BackingField: 10
+  <PlayerCamera>k__BackingField: {fileID: 81641895919050231}
+  <MaxVertAngle>k__BackingField: 75
+  <HoldPoint>k__BackingField: {fileID: 5605753364329560631}
+  <InteractableLayer>k__BackingField:
+    serializedVersion: 2
+    m_Bits: 64
+  <InteractionDistance>k__BackingField: 19
 --- !u!143 &4394431803158909743
 CharacterController:
   m_ObjectHideFlags: 0
@@ -309,7 +313,7 @@ Transform:
   m_GameObject: {fileID: 6398064608131992811}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.38, z: 0.7}
+  m_LocalPosition: {x: 0, y: -1, z: 1.03}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []

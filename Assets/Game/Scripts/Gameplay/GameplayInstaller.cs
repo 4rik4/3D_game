@@ -8,6 +8,7 @@ public class GameplayInstaller : MonoInstaller<GameplayInstaller>
 {
     [SerializeField] private Transform _spawnPoint;
     [SerializeField] private CharacterView _characterPrefab;
+    [SerializeField] private TriggerTaker _trigger;
     private Transform _holdPoint;
 
     public override void InstallBindings()
