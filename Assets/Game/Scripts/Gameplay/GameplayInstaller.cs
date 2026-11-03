@@ -19,6 +19,7 @@ public class GameplayInstaller : MonoInstaller<GameplayInstaller>
         BindHoldPoint();
         BindTriggerView();
         BindBoxDeliveryService();
+        BindGlassWallService();
     }
 
     private void BindCharacterView()
@@ -62,5 +63,13 @@ public class GameplayInstaller : MonoInstaller<GameplayInstaller>
         .BindInterfacesAndSelfTo<BoxDeliveryService>()
         .AsSingle()
         .NonLazy();
+    }
+
+    private void BindGlassWallService()
+    {
+        Container
+       .BindInterfacesAndSelfTo<GlassWallService>()
+       .AsSingle()
+       .NonLazy();
     }
 }

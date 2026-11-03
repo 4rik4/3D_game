@@ -12,7 +12,7 @@ public class BoxDeliveryService : IDisposable
     private CharacterView _characterView;
 
     public event Action OnWon;
-    public event Action<HeavyObjectController> OnDestroy;
+  //  public event Action<BoxView> OnDestroy;
 
     private int _boxesDelivered = 0;
     private int _boxCount;
@@ -27,10 +27,11 @@ public class BoxDeliveryService : IDisposable
         _triggerView.BoxEntered += OnDelivered;
     }
 
-    private void OnDelivered(HeavyObjectController box)
+    private void OnDelivered(BoxView box)
     {
         if (!box.IsDelivering) return;
-        OnDestroy?.Invoke(box);
+        box.BoxDelivered();
+  //      OnDestroy?.Invoke(box);
 
         _boxesDelivered++;
 

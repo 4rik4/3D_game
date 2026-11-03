@@ -12,11 +12,11 @@ public class PlayerHandService : IDisposable
     private Transform _holdPoint;
     private Camera _playerCamera;
 
-    private List<HeavyObjectController> _currentHeldObjects = new List<HeavyObjectController>();
+    private List<BoxView> _currentHeldObjects = new List<BoxView>();
 
     private float _stackHeight = 0f;
     public float stackWeight { get; private set; } = 0f;
-    
+
     private float _maxPossibleSize = 1.3f;
     private float _throwForce = 10.0f;
     private int _maxPossibleCount = 3;
@@ -25,7 +25,7 @@ public class PlayerHandService : IDisposable
     private Vector2 _mouseDelta;
 
     public event Action ObjectPickedUp;
-    public event Action ObjectDroppedDown;
+    public event Action<BoxView> ObjectDroppedDown;
 
     public PlayerHandService(IInputService inputService, CharacterView view)
     {
@@ -47,7 +47,7 @@ public class PlayerHandService : IDisposable
         Ray ray = _playerCamera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
         if (Physics.Raycast(ray, out RaycastHit hit, _characterView.InteractionDistance, _characterView.InteractableLayer) == false) return;
 
-        if (hit.collider.TryGetComponent(out HeavyObjectController box) == false) return;
+        if (hit.collider.TryGetComponent(out BoxView box) == false) return;//??? а так можно вообще, это же типо сервис,не? 
 
         Vector3 boxSize = hit.transform.localScale;
         float maxSide = Mathf.Max(boxSize.x, boxSize.y, boxSize.z);
@@ -64,7 +64,7 @@ public class PlayerHandService : IDisposable
         box.transform.localPosition = new Vector3(0, yOffset, 0);
         box.transform.localRotation = Quaternion.identity;
 
-        box.gameObject.layer = 1;
+        box.gameObject.layer = 0;
 
         _currentHeldObjects.Add(box);
 
@@ -79,7 +79,7 @@ public class PlayerHandService : IDisposable
         if (_currentHeldObjects.Count == 0) return;
 
         int iLast = _currentHeldObjects.Count - 1;
-        HeavyObjectController boxToDrop = _currentHeldObjects[iLast];
+        BoxView boxToDrop = _currentHeldObjects[iLast];
         _currentHeldObjects.RemoveAt(iLast);
 
         boxToDrop.transform.SetParent(null);
@@ -100,7 +100,7 @@ public class PlayerHandService : IDisposable
         _stackHeight -= boxToDrop.transform.localScale.y;
         stackWeight -= boxToDrop.Weight;
 
-        ObjectDroppedDown?.Invoke();
+        ObjectDroppedDown?.Invoke(boxToDrop);
     }
      
     public void Dispose()

@@ -8,7 +8,7 @@ public class CharacterMover : ITickable
 {
     private IInputService _input;
     private CharacterView _characterView;
-    private HeavyObjectController _boxView;
+    private BoxView _boxView;
     private PlayerHandService _handService;
     private Camera _playerCamera;
 
@@ -28,7 +28,6 @@ public class CharacterMover : ITickable
     private Vector3 _bobAmount = new Vector3(0f, 0.1f, 0f);
     private Vector3 _cameraOriginalPos;
 
-    private bool _isHolding = false;
   //  private bool _isSprinting = false;
 
     public CharacterMover(IInputService input, CharacterView characterView, PlayerHandService handService)
@@ -60,9 +59,7 @@ public class CharacterMover : ITickable
 
     private void Sprint()
     {
-        if (_isHolding) Debug.Log("No спринтинг брат");
-        else
-        {
+        if (_handService.stackWeight >= 5) Debug.Log("No спринтинг брат");
             if (_input.IsSprinting == true)
             {
                 // _isSprinting = true;
@@ -73,7 +70,6 @@ public class CharacterMover : ITickable
                 //  _isSprinting = false;
                 _currentSpeed = _maxSpeed;
             }
-        }
     }
 
     private void PickUp()
@@ -84,14 +80,15 @@ public class CharacterMover : ITickable
         else
             _currentSpeed = 0;
         _jumpSpeed -= _handService.stackWeight / 3f;
-        _isHolding = true;
     }
 
-    private void DropDown()
+    private void DropDown(BoxView droppedBox)
     {
-        _currentSpeed = _maxSpeed;
-        _jumpSpeed = _characterView.JumpSpeed;
-        _isHolding = false;
+        if (_handService.stackWeight * 0.4 <= _maxSpeed)
+            _currentSpeed = _maxSpeed - _handService.stackWeight * 0.4f;
+        else
+            _currentSpeed = 0;
+        _jumpSpeed += droppedBox.Weight / 3f;
     }
 
     private void Jump()

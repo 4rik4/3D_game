@@ -1,16 +1,17 @@
 using System;
 using UnityEngine;
-using Game.Scripts.Gameplay.Views;
 
-public class TriggerView : MonoBehaviour
+namespace Game.Scripts.Gameplay.Views
 {
-    public event Action<HeavyObjectController> BoxEntered;
-
-    private void OnTriggerEnter(Collider other)
+    public class TriggerView : MonoBehaviour
     {
-        if(other.TryGetComponent(out HeavyObjectController box))
-            BoxEntered?.Invoke(box);
-    }
+        public event Action<BoxView> BoxEntered;
 
+        private void OnTriggerEnter(Collider other)
+        {
+            if (other.TryGetComponent(out BoxView box))
+                BoxEntered?.Invoke(box);
+        }
+    }
 }
 
