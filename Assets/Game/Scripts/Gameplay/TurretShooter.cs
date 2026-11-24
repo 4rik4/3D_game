@@ -15,7 +15,13 @@ namespace Game.Scripts.Gameplay
         {
             _turretView = turretView;
             _turretView.RangeTriggerEntered += Triggered;
+            _turretView.RangeTriggerExited += Exited;
             
+        }
+
+        private void Exited(Collider obj)
+        {
+            _target = null;
         }
 
         private void Triggered(Collider obj)
